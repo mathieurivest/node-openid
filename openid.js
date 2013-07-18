@@ -1429,8 +1429,9 @@ var attributeMapping =
   , 'http://axschema.org/namePerson': 'fullname'
 };
 
-openid.AttributeExchange = function AttributeExchange(options) 
-{ 
+openid.AttributeExchange = function AttributeExchange(options, resolveAlias)
+{
+  this.resolveAlias = resolveAlias;
   this.requestParams = {'openid.ns.ax': 'http://openid.net/srv/ax/1.0',
     'openid.ax.mode' : 'fetch_request'};
   var required = [];
@@ -1497,7 +1498,11 @@ openid.AttributeExchange.prototype.fillResult = function(params, result)
   {
     if (aliases[ns] in values)
     {
-      result[aliases[ns]] = values[aliases[ns]];
+        if (this.resolveAlias) {
+            this.resolveAlias(result, values, aliases, ns);
+        } else {
+            result[aliases[ns]] = values[aliases[ns]];
+        }
     }
   }
 }
